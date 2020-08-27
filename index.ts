@@ -1,4 +1,6 @@
 import { OpentokService } from './opentok.service';
+import {OtEventNames} from "./opentok.model";
+
 const otService = new OpentokService();
 
 
