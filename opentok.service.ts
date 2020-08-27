@@ -82,11 +82,11 @@ export class OpentokService {
     */
 
     this.coachStreamLifecycleEvents$ = this.streamLifecycleEvents$.pipe(
-      filter((event) => this.isCoachConnection(event['stream']?.connection))
+      filter((event) => event['stream'] && event['stream'].connection && this.isCoachConnection(event['stream'].connection))
     );
 
     this.memberStreamLifecycleEvents$ = this.streamLifecycleEvents$.pipe(
-      filter((event) => !this.isCoachConnection(event['stream']?.connection)),
+      filter((event) => event['stream'] && event['stream'].connection && !this.isCoachConnection(event['stream'].connection)),
       // tslint:disable:no-console
       tap((_) => console.log('naz:: memberStreamLifecycleEvents$', _))
     );
