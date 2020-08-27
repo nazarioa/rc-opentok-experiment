@@ -1,12 +1,16 @@
 import * as OT from '@opentok/client';
-import { Observable, of, throwError } from 'rxjs';
-import { filter, shareReplay } from 'rxjs/operators';
-import { OtEventNames, Signal } from './opentok.model';
+import {Observable, of, throwError} from 'rxjs';
+import {filter, shareReplay, tap} from 'rxjs/operators';
+import {OtEventNames} from './opentok.model';
+import {ConnectionData, Signal} from "./live-session.mode";
 
 export class OpentokService {
   masterEvents$: Observable<any>;
   sessionConnectionLifecycleEvents$: Observable<OT.Event<any, any>>;
-  
+  streamLifecycleEvents$: Observable<OT.Event<any, any>>;
+  coachStreamLifecycleEvents$: Observable<OT.Event<any, any>>;
+  memberStreamLifecycleEvents$: Observable<OT.Event<any, any>>;
+
   private opentokSession: OT.Session;
 
   constructor() {}
@@ -60,12 +64,11 @@ export class OpentokService {
       shareReplay(1)
     );
 
-    /*
     this.streamLifecycleEvents$ = this.masterEvents$.pipe(
       filter((event) => [OtEventNames.StreamCreated, OtEventNames.StreamDestroyed].includes(event.type)),
       shareReplay(1)
     );
-
+    /*
     this.isCoachConnected$ = merge(
       this.streamLifecycleEvents$.pipe(
         map((event) => !!event['target']['connections'].find((c) => this.isCoachConnection(c))),
@@ -76,6 +79,7 @@ export class OpentokService {
         map((event) => event.type === OtEventNames.ConnectionCreated || event.type !== OtEventNames.ConnectionDestroyed)
       )
     ).pipe(startWith(false), shareReplay(1));
+    */
 
     this.coachStreamLifecycleEvents$ = this.streamLifecycleEvents$.pipe(
       filter((event) => this.isCoachConnection(event['stream']?.connection))
@@ -213,6 +217,59 @@ export class OpentokService {
       return throwError(new Error('Error: Could not establish OpenTok connection'));
     }
 
+  }
+
+  connectSession(token: string): Observable<void> {
+    return new Observable((observer) => {
+      this.opentokSession.connect(token, (err) => {
+        if (err) {
+          observer.error(err);
+        } else {
+          observer.next();
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  sessionMediaSubscribe(
+    element: string,
+    stream: OT.Stream,
+    options?: OT.SubscriberProperties
+  ): Observable<OT.Subscriber> {
+    console.warn('naz:: inside of sessionMediaSubscribe ');
+    return new Observable((observer) => {
+      console.log('naz:: inside of sessionMediaSubscribe subscriber ');
+      const subscription = this.opentokSession.subscribe(stream, element, options, (err) => {
+        if (err) {
+          console.log('naz:: inside of sessionMediaSubscribe callback, err ', err, element, options);
+          observer.error(err);
+        } else {
+          console.log('naz:: inside of sessionMediaSubscribe callback, v ', subscription, element, options);
+          observer.next(subscription);
+          observer.complete();
+        }
+      });
+    });
+  }
+
+  isCoachConnection(connection: OT.Connection): boolean {
+    const data = this.parseConnectionData<ConnectionData>(connection);
+    return data !== null && !!data.coachId;
+  }
+
+  parseConnectionData<D>(connection: OT.Connection): D {
+    if (typeof connection?.data === 'undefined') {
+      return null;
+    }
+
+    let result = null;
+    try {
+      result = JSON.parse(connection.data) as D;
+    } catch (e) {
+      console.error('Error parsing stream connection data', e, connection);
+    }
+    return result;
   }
 
 }
