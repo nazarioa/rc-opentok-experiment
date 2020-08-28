@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "go": "npm run tsc && http-server"
+    "serve": "http-server",
+    "go": "npm run tsc && npm run serve"
   },
   "dependencies": {
     "@opentok/client": "2.17.5",
