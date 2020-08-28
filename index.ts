@@ -1,18 +1,13 @@
 import {OpentokService} from './opentok.service';
 import {filter, switchMap, switchMapTo, tap} from "rxjs/operators";
-import {OtEventNames} from "./opentok.model";
+import {OtEventNames} from './opentok.model';
+import data from './secrets.json';
 
 const otService = new OpentokService();
-
-
-const apiKey = '';
-const sessionId = '';
-const token = '';
-
-const initializedTokBoxSession = otService.initSession(apiKey, sessionId);
+const initializedTokBoxSession = otService.initSession(data.apiKey, data.sessionId);
 
 initializedTokBoxSession.pipe(
-  switchMapTo(otService.connectSession(token)),
+  switchMapTo(otService.connectSession(data.token)),
 ).subscribe({
   next: n => console.log('Success initLiveSession', n),
   error: e => console.log('Fail initLiveSession', e),
