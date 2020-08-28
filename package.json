@@ -2,10 +2,18 @@
   "name": "opentalk_playground",
   "version": "1.0.0",
   "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc"
+  },
   "dependencies": {
     "@opentok/client": "2.17.5",
+    "@types/node": "^14.6.1",
     "rxjs": "6.5.5",
-    "typescript": "3.8.3",
     "tslib": "1.10.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
   }
 }

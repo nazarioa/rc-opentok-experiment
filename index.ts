@@ -1,7 +1,7 @@
 import {OpentokService} from './opentok.service';
 import {filter, mergeMap, switchMap, switchMapTo, tap} from "rxjs/operators";
 import {OtEventNames} from './opentok.model';
-import data from './secrets.json';
+var data = require('./secrets.json');
 
 const otService = new OpentokService();
 const initializedTokBoxSession = otService.initSession(data.apiKey, data.sessionId);
