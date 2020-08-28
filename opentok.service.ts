@@ -2,7 +2,7 @@ import * as OT from '@opentok/client';
 import {Observable, of, throwError} from 'rxjs';
 import {filter, shareReplay, tap} from 'rxjs/operators';
 import {OtEventNames} from './opentok.model';
-import {ConnectionData, Signal} from "./live-session.mode";
+import {ConnectionData, Signal} from "./live-session.model";
 
 export class OpentokService {
   masterEvents$: Observable<any>;
