@@ -259,7 +259,7 @@ export class OpentokService {
   }
 
   parseConnectionData<D>(connection: OT.Connection): D {
-    if (typeof connection?.data === 'undefined') {
+    if (typeof connection && connection.data && connection.data === 'undefined') {
       return null;
     }
 
