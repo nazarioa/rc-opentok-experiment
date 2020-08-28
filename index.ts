@@ -25,6 +25,6 @@ otService.coachStreamLifecycleEvents$.pipe(
     width: '100%',
   }))
 ).subscribe({
-  next: n => console.log('Success', n),
-  error: e => console.log('Fail', e),
+  next: n => console.log('Connect to coach video - success', n),
+  error: e => console.log('Connect to coach video - fail', e),
 });
