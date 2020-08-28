@@ -253,6 +253,23 @@ export class OpentokService {
     });
   }
 
+
+  /**
+   * One of two forms to setup a publisher.
+   * @note OpenTok bug: This form of `publish` does exist in the Typescript but as of v2.17, this form ignores the PublisherProperty:
+   * publishVideo: false. Use with caution.
+   *
+   * @param element
+   * @param options
+   */
+  sessionMediaInitPublisher(element: string, options?: OT.PublisherProperties): Observable<OT.Publisher> {
+    const publisher = this.OT.initPublisher(element, options);
+    if (!publisher) {
+      return throwError('Error, Could not initialize publisher');
+    }
+    return of(publisher);
+  }
+
   isCoachConnection(connection: OT.Connection): boolean {
     const data = this.parseConnectionData<ConnectionData>(connection);
     return data !== null && !!data.coachId;
