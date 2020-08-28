@@ -15,7 +15,6 @@ initializedTokBoxSession.pipe(
 
 otService.coachStreamLifecycleEvents$.pipe(
   filter(event => event.type === OtEventNames.StreamCreated),
-  tap(_ => console.log('>>> am I undefined', _)),
   switchMap(event => otService.sessionMediaSubscribe('camera-outlet', event['stream'], {
     fitMode: 'contain',
     height: '100%',
