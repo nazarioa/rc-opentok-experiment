@@ -4,7 +4,7 @@
 import * as OT from '@opentok/client';
 import {Observable, of, throwError} from 'rxjs';
 import {filter, shareReplay, tap} from 'rxjs/operators';
-import {OtEventNames} from './opentok.model';
+import {OtEventNames, OtSignalSendRequest} from './opentok.model';
 import {ConnectionData, Signal} from "./live-session.model";
 
 export class OpentokService {
@@ -296,4 +296,16 @@ export class OpentokService {
     return result;
   }
 
+  sendSessionSignal<T extends string>(signal: OtSignalSendRequest<T>): Observable<void> {
+    return new Observable((observer) => {
+      this.opentokSession.signal(signal, (err) => {
+        if (err) {
+          observer.error(err);
+        } else {
+          observer.next();
+          observer.complete();
+        }
+      });
+    });
+  }
 }
