@@ -1,3 +1,6 @@
+// @ts-nocheck
+// because of implicit event types errors
+
 import * as OT from '@opentok/client';
 import {Observable, of, throwError} from 'rxjs';
 import {filter, shareReplay, tap} from 'rxjs/operators';

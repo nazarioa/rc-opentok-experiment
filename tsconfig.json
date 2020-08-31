@@ -1,17 +1,8 @@
 {
+  "files": [":src/*.ts"],
   "compilerOptions": {
-    "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "moduleResolution": "node",
-    "noImplicitAny": false,
-    "outDir": "dist",
-    "removeComments": false,
-    "sourceMap": true,
-    "target": "ES2017"
-  },
-  "exclude": [
-    "node_modules",
-    ".npm"
-  ]
+    "noImplicitAny": true,
+    "target": "es2015",
+    "moduleResolution": "node"
+  }
 }
