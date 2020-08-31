@@ -222,6 +222,10 @@ export class OpentokService {
 
   }
 
+  get connectionId(): string {
+    return this.opentokSession?.connection?.connectionId ?? '';
+  }
+
   connectSession(token: string): Observable<void> {
     return new Observable((observer) => {
       this.opentokSession.connect(token, (err) => {
