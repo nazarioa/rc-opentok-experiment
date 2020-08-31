@@ -18,3 +18,10 @@ export interface ConnectionData {
   coachId?: string;
   membershipType?: any;
 }
+
+export enum VideoMode {
+  Camera = 'camera',
+  Custom = 'custom',
+  Screen = 'screen',
+  Video = 'video',
+}
