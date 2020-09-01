@@ -4,14 +4,7 @@ import {OtEventNames} from './opentok.model';
 import * as OT from '@opentok/client';
 import {merge, Observable} from "rxjs";
 import {Signal, VideoMode} from "./live-session.model";
-// const data = require('./secrets.json'); // naz to fix this
-
-// because i don't feel like dealing with this thing right now
-const data = {
-  "apiKey": "CHANGE_ME",
-  "sessionId": "CHANGE_ME",
-  "token": "CHANGE_ME"
-};
+import data from './../secrets.json';
 
 const otService = new OpentokService();
 const initializedTokBoxSession = otService.initSession(data.apiKey, data.sessionId);
