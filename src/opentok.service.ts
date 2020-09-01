@@ -4,7 +4,7 @@
 import * as OT from '@opentok/client';
 import {Observable, of, throwError} from 'rxjs';
 import {filter, shareReplay, tap} from 'rxjs/operators';
-import {OtEventNames} from './opentok.model';
+import {OtEventNames, OtSignalSendRequest} from './opentok.model';
 import {ConnectionData, Signal} from "./live-session.model";
 
 export class OpentokService {
@@ -89,9 +89,11 @@ export class OpentokService {
     );
 
     this.memberStreamLifecycleEvents$ = this.streamLifecycleEvents$.pipe(
+      // tslint:disable:no-console
+      tap((_) => console.log('naz:: memberStreamLifecycleEvents$ A', _)),
       filter((event) => event['stream'] && event['stream'].connection && !this.isCoachConnection(event['stream'].connection)),
       // tslint:disable:no-console
-      tap((_) => console.log('naz:: memberStreamLifecycleEvents$', _))
+      tap((_) => console.log('naz:: memberStreamLifecycleEvents$ B', _))
     );
 
     /**
@@ -222,6 +224,10 @@ export class OpentokService {
 
   }
 
+  get connectionId(): string {
+    return this.opentokSession?.connection?.connectionId ?? '';
+  }
+
   connectSession(token: string): Observable<void> {
     return new Observable((observer) => {
       this.opentokSession.connect(token, (err) => {
@@ -292,4 +298,16 @@ export class OpentokService {
     return result;
   }
 
+  sendSessionSignal<T extends string>(signal: OtSignalSendRequest<T>): Observable<void> {
+    return new Observable((observer) => {
+      this.opentokSession.signal(signal, (err) => {
+        if (err) {
+          observer.error(err);
+        } else {
+          observer.next();
+          observer.complete();
+        }
+      });
+    });
+  }
 }
