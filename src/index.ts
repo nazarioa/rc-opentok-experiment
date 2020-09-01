@@ -76,12 +76,12 @@ otService.coachStreamLifecycleEvents$.pipe(
   // @ts-ignore event any error - naz fix this
   switchMap(event => otService.sessionMediaSubscribe('camera-outlet', event['stream'], {
     fitMode: 'contain',
-    height: '100%',
+    height: '500px',
     insertMode: 'append',
     showControls: false,
     subscribeToAudio: false,
     subscribeToVideo: true,
-    width: '100%',
+    width: '800px',
   }))
 ).subscribe({
   next: n => console.log('Connect to coach video - success', n),
