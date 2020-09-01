@@ -89,9 +89,11 @@ export class OpentokService {
     );
 
     this.memberStreamLifecycleEvents$ = this.streamLifecycleEvents$.pipe(
+      // tslint:disable:no-console
+      tap((_) => console.log('naz:: memberStreamLifecycleEvents$ A', _)),
       filter((event) => event['stream'] && event['stream'].connection && !this.isCoachConnection(event['stream'].connection)),
       // tslint:disable:no-console
-      tap((_) => console.log('naz:: memberStreamLifecycleEvents$', _))
+      tap((_) => console.log('naz:: memberStreamLifecycleEvents$ B', _))
     );
 
     /**

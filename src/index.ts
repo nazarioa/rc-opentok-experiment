@@ -100,15 +100,18 @@ merge(
       event['target']['streams'].find(
         (s: OT.Stream) => otService.isCoachConnection(s['connection']) && s?.videoType !== VideoMode.Screen
       )
-    )
+    ),
+    tap(_ => console.log('naz:: A ******', _)),
   ),
   otService.coachStreamLifecycleEvents$.pipe(
     // @ts-ignore event any error - naz fix this
     filter((event: OT.Event<any, any>) => event.type === OtEventNames.StreamCreated && event['stream'].videoType !== VideoMode.Screen),
-    pluck('stream')
+    pluck('stream'),
+    tap(_ => console.log('naz:: B ******', _)),
   )
 )
   .pipe(
+    tap(_ => console.log('naz:: C ******', _)),
     filter((s) => !!s),
     filter((s) => {
       if (!coachAudioStreamSubscription) {
