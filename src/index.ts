@@ -23,7 +23,6 @@ function subscribeCoachAudioFeed(stream: OT.Stream): void {
     })
     .pipe(
       // tslint:disable:no-console
-      tap((_) => console.log('naz:: subscribing to coach audio', _)),
       filter((otSubscription) => !!otSubscription),
       tap((otSubscription) => {
         coachAudioStreamBlocked$ = new Observable((observer) => {
@@ -34,10 +33,6 @@ function subscribeCoachAudioFeed(stream: OT.Stream): void {
           );
         });
       }),
-      tap((otSubscription) => (coachAudioStreamSubscription = otSubscription)),
-      tap(() =>
-        otService.sendSessionSignal({ type: Signal.HandLowered, data: otService.connectionId })
-      ),
       tap(() =>
         otService.sendSessionSignal({
           type: Signal.StageRequestCanceled,
@@ -48,11 +43,9 @@ function subscribeCoachAudioFeed(stream: OT.Stream): void {
     .subscribe({
       next: () => {
         console.log('Success, Coach Audio Subscription')
-        // this.engageAudio();
       },
       error: (err) => {
         console.log('Error, Coach Audio Subscription: ', err.message);
-        // this.engageAudio();
       },
     });
 }
@@ -94,17 +87,14 @@ merge(
         (s: OT.Stream) => otService.isCoachConnection(s['connection']) && s?.videoType !== VideoMode.Screen
       )
     ),
-    tap(_ => console.log('naz:: A ******', _)),
   ),
   otService.coachStreamLifecycleEvents$.pipe(
     // @ts-ignore event any error - naz fix this
     filter((event: OT.Event<any, any>) => event.type === OtEventNames.StreamCreated && event['stream'].videoType !== VideoMode.Screen),
     pluck('stream'),
-    tap(_ => console.log('naz:: B ******', _)),
   )
 )
   .pipe(
-    tap(_ => console.log('naz:: C ******', _)),
     filter((s) => !!s),
     filter((s) => {
       if (!coachAudioStreamSubscription) {
@@ -173,31 +163,3 @@ otService
   next: s => console.log('Published your audio - success', s),
   error: e => console.log('Published your audio - fail', e),
 });
-  /*
-  .pipe(
-    tap((publisher) => {
-      // Emits a value if the browser security restrictions on mic changes
-      publisher.on({
-        accessDenied: () => {
-          this.uiStateMicrophone$.next(MicrophoneState.Blocked);
-          this.opentokService.coachCommunicationConnection$
-            .pipe(
-              switchMap((connection) =>
-                this.opentokService.sendSessionSignal({
-                  type: Signal.StageRequestCanceled,
-                  data: this.opentokService.connectionId,
-                  to: connection,
-                })
-              )
-            )
-            .subscribe();
-        },
-      });
-    }),
-    catchError((err) => {
-      console.log.error(err);
-      this.uiStateMicrophone$.next(MicrophoneState.Muted);
-      throw err;
-    })
-  );
-*/
