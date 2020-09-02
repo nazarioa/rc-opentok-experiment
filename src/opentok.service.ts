@@ -131,11 +131,38 @@ export class OpentokService {
    * @param options
    */
   sessionMediaInitPublisher(element: string, options?: OT.PublisherProperties): Observable<OT.Publisher> {
+    /*
     const publisher = this.OT.initPublisher(element, options);
     if (!publisher) {
       return throwError('Error, Could not initialize publisher');
     }
     return of(publisher);
+*/
+    return new Observable<OT.Publisher>(observer => {
+      const publisher = this.OT.initPublisher(element, options, err => {
+        if (err) {
+          console.log('naz: sessionMediaInitPublisher >>> ERR')
+          observer.error(err);;
+        } else {
+          console.log('>>>>naz: sessionMediaInitPublisher >>> SUCCESS')
+          observer.next(publisher);
+          observer.complete();
+        }
+      })
+    });
+  }
+
+  publishMediaToStream(publisher: OT.Publisher): Observable<void> {
+    return new Observable((observer) => {
+      this.opentokSession.publish(publisher, (err) => {
+        if (err) {
+          observer.error(err);
+        } else {
+          observer.next();
+          observer.complete();
+        }
+      });
+    });
   }
 
   isCoachConnection(connection: OT.Connection): boolean {

@@ -11,6 +11,28 @@ const initializedTokBoxSession = otService.initSession(data.apiKey, data.session
 let coachAudioStreamSubscription: OT.Subscriber;
 let coachAudioStreamBlocked$: Observable<OT.Event<any, any>>;
 
+
+const connectSession = initializedTokBoxSession.pipe(
+  switchMapTo(otService.connectSession(data.token)),
+);
+
+const initPublisherAndPublishToStream = otService
+  .sessionMediaInitPublisher('ai-member-audio', {
+    fitMode: 'contain',
+    height: 0,
+    insertMode: 'append',
+    mirror: false,
+    publishAudio: true,
+    publishVideo: false,
+    style: {
+      buttonDisplayMode: 'off',
+    },
+    videoSource: null,
+    width: 0,
+  }).pipe(
+    switchMap(publisher => otService.publishMediaToStream(publisher))
+  );
+
 function subscribeCoachAudioFeed(stream: OT.Stream): void {
   otService
     .sessionMediaSubscribe('ao-coach-generic', stream, {
@@ -50,12 +72,14 @@ function subscribeCoachAudioFeed(stream: OT.Stream): void {
     });
 }
 
-initializedTokBoxSession.pipe(
-  switchMapTo(otService.connectSession(data.token)),
-).subscribe({
-  next: n => console.log('Success initLiveSession', n),
-  error: e => console.log('Fail initLiveSession', e),
-});
+connectSession.pipe(
+  switchMapTo(initPublisherAndPublishToStream)
+).subscribe(
+  {
+    next: () => console.log('Success publishToStream'),
+    error: e => console.log('Fail publishToStream', e),
+  }
+)
 
 otService.coachStreamLifecycleEvents$.pipe(
   filter(event => event.type === OtEventNames.StreamCreated),
@@ -118,48 +142,16 @@ otService.memberStreamLifecycleEvents$
     filter((event) => event.type === OtEventNames.StreamCreated),
     tap((_) => console.log('memberStreamLifecycleEvents$ post filter', _)),
     mergeMap((event) =>
-        otService
+      otService
         // @ts-ignore event any error - naz fix this
-          .sessionMediaSubscribe('ao-member-audio', event['stream'], {
-            insertMode: 'append',
-            subscribeToAudio: true,
-            subscribeToVideo: false,
-          })
-      /*
-      .pipe(
-        tap((_) => console.log('memberStreamLifecycleEvents$ pre retry', _)),
-        retry(2),
-        tap((classMateSubscription) =>
-          classMateSubscription.on(
-            OtEventNames.AudioLevelUpdated,
-            (chatter: OT.Event<OtEventNames.AudioLevelUpdated, OT.Stream>) =>
-              this.membersAudioLevelChangeEvent$.next(chatter)
-          )
-        )
-      )
-    */
+        .sessionMediaSubscribe('ao-member-audio', event['stream'], {
+          insertMode: 'append',
+          subscribeToAudio: true,
+          subscribeToVideo: false,
+        })
     )
   )
   .subscribe({
     next: s => console.log('Subscribe to other members audio - success', s),
     error: e => console.error('Subscribe to other members audio - fail', e),
   });
-
-
-otService
-  .sessionMediaInitPublisher('ai-member-audio', {
-    fitMode: 'contain',
-    height: 0,
-    insertMode: 'append',
-    mirror: false,
-    publishAudio: false,
-    publishVideo: false,
-    style: {
-      buttonDisplayMode: 'off',
-    },
-    videoSource: null,
-    width: 0,
-  }).subscribe({
-  next: s => console.log('Published your audio - success', s),
-  error: e => console.log('Published your audio - fail', e),
-});
